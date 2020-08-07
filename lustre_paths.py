@@ -15,11 +15,10 @@ parser_help =('get a path within the lustre source code. '
             'it just checks if the path is a non-empty directory. '
             'Then a relative path will be added to give the full name.')
 
-
 def set_up_parser(parser=None):
     # parser for this script alone
     if parser is None:
-        parser = argparser.ArgumentParser(help=parser_help)
+        parser = argparse.ArgumentParser(usage=parser_help)
     parser.add_argument('-s', '--show', action='store_true',
         help='show default base paths and relative paths.')
     parser.add_argument('-b', '--base_paths', nargs='*',
@@ -41,10 +40,7 @@ def set_up_parser(parser=None):
     parser_mutex.add_argument('-r', '--relative', nargs='?', const='',
         help='the relative path name. This will be added onto '
         'the lustre root path making <lustre source root>/<relative path>')
-        
-
-
-    
+    return parser
 
 
 # places lustre is likely to be
@@ -117,6 +113,9 @@ def find_path(lustre_path, rel_path_name):
     return lustre_path / rel_path
 
 def main(args):
+    '''Deal with arguments and call appropriate
+    functions.
+    '''
     if args['show']:
         show_paths()
 
@@ -141,7 +140,7 @@ def main(args):
                               check_defaults,
                               check_defaults_first)
 
-    # mutally exclusive based on parser
+    # mutally exclusive if blocks based on parser
     if args['name'] is not None:
         full_path = find_path(lustre_root, args['name'])
         if full_path is not None:
@@ -150,21 +149,10 @@ def main(args):
         print(lustre_root / relative)
     
         
-
-    # paths = args.get('paths')
-    # check_defaults = args.get('check_defaults')
-    # check_defaults_first = args.get('check_defaults_first')
-    # lustre_path = find_lustre(paths, check_defaults, check_defaults_first)
-    # print(lustre_path)
-    
-
-
-
-
-
 if __name__ == '__main__':
-    pass
-
+    parser = set_up_parser(None)
+    args = vars(parser.parse_args())
+    main(args)
 
 
 
