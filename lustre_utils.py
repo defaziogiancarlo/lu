@@ -16,5 +16,8 @@ def check_machine(name):
 
 def make_subprocess_command(path):
     '''make a function that will attemp to run
-    the subprocess using \path.
-    
+    the subprocess using \path.'''
+    pass
+
+def set_up_parser
+
