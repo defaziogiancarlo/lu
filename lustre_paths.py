@@ -8,16 +8,15 @@ import set_colors
 import argparse
 
 
+parser_help =('get a path within the lustre source code. '
+        'This command will attempt to find the root of the lustre source code '
+        'using user given base names or default base name. '
+        'The check to make sure that the given base name is actually lustre is very weak '
+        'it just checks if the path is a non-empty directory. '
+        'Then a relative path will be added to give the full name.')
 
 def set_up_parser(parser=None):
     # parser for this script alone
-
-    parser_help =('get a path within the lustre source code. '
-            'This command will attempt to find the root of the lustre source code '
-            'using user given base names or default base name. '
-            'The check to make sure that the given base name is actually lustre is very weak '
-            'it just checks if the path is a non-empty directory. '
-            'Then a relative path will be added to give the full name.')
     
     if parser is None:
         parser = argparse.ArgumentParser(usage=parser_help)
