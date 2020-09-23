@@ -15,7 +15,7 @@ import uuid
 # could deal with race conditions if you
 # really like pain, make an atomic file modification
 # function
-def bashize(path):
+def main(path):
     '''Create a bash script at the given path.
     If no file exists, create one.
     If a file does exist but does not start with

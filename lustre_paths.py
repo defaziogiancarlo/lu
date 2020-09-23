@@ -2,8 +2,8 @@ __doc__ = '''
 Find lustre on the system.
 '''
 
-from collections import OrderedDict
-from pathlib import Path
+import collections
+import pathlib
 import set_colors
 import argparse
 
@@ -45,11 +45,11 @@ def set_up_parser(parser=None):
 
 
 # places lustre is likely to be
-default_lustre_paths = list(OrderedDict.fromkeys([
-    Path.home() / 'lustre-release',
-    Path.home() / 'lustre',
-    Path('/g/g0/defazio1') / 'lustre-release',
-    Path('/g/g0/defazio1') / 'lustre',
+default_lustre_paths = list(collections.OrderedDict.fromkeys([
+    pathlib.Path.home() / 'lustre-release',
+    pathlib.Path.home() / 'lustre',
+    pathlib.Path('/g/g0/defazio1') / 'lustre-release',
+    pathlib.Path('/g/g0/defazio1') / 'lustre',
 ]))
 
 # important relative paths within lustre
