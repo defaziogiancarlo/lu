@@ -10,11 +10,11 @@ import uuid
 # if this command is called directly,
 # or as the subcommand help string if called indirecly by lu
 # required for use by lu
-parser_help = ('Create a bash script with at the path given by the user.'
-               'Prepend the line #!/bin/bash and make executable.'
-               'Find the correct location of bash if not /bin/bash.'
-               'If the file already begins with \'#!\' or is not a normal'
-               'file, make no changes to it.')
+parser_help = '''Create a bash script at the given path.
+Prepend the line #!/bin/bash and make the script executable.
+Find the correct location of bash if not /bin/bash.
+If the file already exists and begins with \'#!\' or 
+is not a normal file, make no changes to it.'''
 
 # a wrapper for set_up_parser_local
 # allows for the case that an existing parser is

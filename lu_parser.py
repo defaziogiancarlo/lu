@@ -33,14 +33,12 @@ import argparse
 
 # modules that implement subcommands
 import bashize
-import bashize2
 import path
 import subcommand
 
 # store each subcommand with its corresponding module
 subcommands = {'path' : path,
                'bashize' : bashize,
-               'bashize2' : bashize2,               
                'subcommand' : subcommand,
 }
 
@@ -48,7 +46,7 @@ def add_module_parser(module_name, subcommand_name, subparsers):
     '''Add the parser of a module to the main parser.'''
     # create a subparser attached to subparsers
     module_parser = subparsers.add_parser(subcommand_name,
-                                          help=module_name.parser_help)
+                                          description=module_name.parser_help)
     module_name.set_up_parser(module_parser)
 
 
