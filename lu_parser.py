@@ -33,12 +33,14 @@ import argparse
 
 # modules that implement subcommands
 import bashize
-import subcommand
+import bashize2
 import path
+import subcommand
 
 # store each subcommand with its corresponding module
 subcommands = {'path' : path,
                'bashize' : bashize,
+               'bashize2' : bashize2,               
                'subcommand' : subcommand,
 }
 
