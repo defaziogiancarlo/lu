@@ -71,8 +71,8 @@ def set_up_parser(parser=None):
     set_up_parser_local(parser)
 
 def set_up_parser_local(parser):
-    parser.add_argument(module_name,
-                        help='the name of the subcommand')
+    parser.add_argument('path',
+                        help='the path of the subcommand module')
 
 
 # the function that actually executes the command
@@ -83,7 +83,7 @@ def main(args):
 
     # add .py to path in needed
     if path.suffix != '.py':
-        path = path / '.py'
+        path = path.with_suffix('.py')
 
     # if path already exists don't overwrite it
     if path.exists():
@@ -91,7 +91,7 @@ def main(args):
               file=sys.stderr)
         return
 
-    with open(path, 'r') as f:
+    with open(path, 'w') as f:
         f.write(command_template)
 
 
