@@ -2,10 +2,12 @@ __doc__ = '''
 Find lustre on the system.
 '''
 
+import argparse
 import collections
 import pathlib
+
 import set_colors
-import argparse
+
 
 
 parser_help =('get a path within the lustre source code. '
