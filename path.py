@@ -41,6 +41,7 @@ def set_up_parser(parser=None):
     parser_mutex.add_argument('-r', '--relative', nargs='?', const='',
         help='the relative path name. This will be added onto '
         'the lustre root path making <lustre source root>/<relative path>')
+    parser.set_defaults(func=main)
     return parser
 
 
@@ -118,6 +119,9 @@ def main(args):
     '''Deal with arguments and call appropriate
     functions.
     '''
+    if not isinstance(args, dict):
+        args = vars(args)
+    
     if args['show']:
         show_paths()
 
@@ -152,7 +156,7 @@ def main(args):
     
         
 if __name__ == '__main__':
-    parser = set_up_parser(None)
+    parser = set_up_parser()
     args = vars(parser.parse_args())
     main(args)
 

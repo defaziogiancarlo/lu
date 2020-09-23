@@ -6,23 +6,42 @@ If the file already begins with '#!' or is not a normal
 file, make no changes to it.
 '''
 
+import argparse
 import pathlib
 import shutil
 import subprocess
 import sys
 import uuid
 
+parser_help = ('Create a bash script with at the path given by the user.'
+               'Prepend the line #!/bin/bash and make executable.'
+               'Find the correct location of bash if not /bin/bash.'
+               'If the file already begins with \'#!\' or is not a normal'
+               'file, make no changes to it.')
+
+def set_up_parser(parser=None):
+    if parser is None:
+        parser = argparse.ArgumentParser(usage=parser_help)
+    parser.add_argument('path',
+                        help='the path to the bash script')
+    parser.set_defaults(func=main)
+    
+
+
 # could deal with race conditions if you
 # really like pain, make an atomic file modification
 # function
-def main(path):
+# args is expected to be a dict
+def main(args):
     '''Create a bash script at the given path.
     If no file exists, create one.
     If a file does exist but does not start with
     #!, add #!/bin/bash and make executable,
     if #! already exists, do nothing.
     '''
-    path = pathlib.Path(path)
+    if not isinstance(args, dict):
+        args = vars(args)
+    path = pathlib.Path(args['path'])
 
     # get bash's path
     which_bash_path = subprocess.run(['which', 'bash'],
@@ -57,3 +76,8 @@ def main(path):
     # overwrite and set permisssions
     shutil.move(f_name, path)
     path.chmod(0o744)
+
+if __name__ == '__main__':
+    parser = set_up_parser()
+    args = vars(parser.parse_args())
+    main(args)

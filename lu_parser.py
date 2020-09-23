@@ -1,71 +1,62 @@
 __doc__ = '''
-Master parser for all commands
+Master parser for all commands.
+
+This argparser is designed to build up
+one large argparser from a set of module,
+each of which implements a subcommand and can
+be called individually.
+
+Each module the implements a subcommand should have:
+
+A string called 'parser_help', which is just the main
+help string for its parser, The one that can be optionally
+specified when adding a subparser.
+
+A function called 'set_up_parser'.
+This function should optionally take an existing parser
+as an input, and have a default value of None for the parser. 
+In the case that an existing parser is passed in
+(as one is in the function add_module_parser), the parser
+is modified to have a new subcommand from the module.
+If the parser is None, which should happen when the module
+is run as __main__ and not part of lu, the function should 
+make a new parser.
+The module should set the appropriate function to 
+acutally execute the command to 'func' in the parser.
+Also, that function should be able to accept args resulting
+from the argparse as a dict.
+
+See any of modules in 'subcommands' for examples. 
 '''
 
 import argparse
 
-import lustre_utils
-
+# modules that implement subcommands
 import bashize
-import lustre_paths
+import subcommand
+import path
 
-# store each subcommand with it's corresponding module
-subcommands = {'path' : lustre_paths,
+# store each subcommand with its corresponding module
+subcommands = {'path' : path,
                'bashize' : bashize,
+               'subcommand' : subcommand,
 }
+
+def add_module_parser(module_name, subcommand_name, subparsers):
+    '''Add the parser of a module to the main parser.'''
+    # create a subparser attached to subparsers
+    module_parser = subparsers.add_parser(subcommand_name,
+                                          help=module_name.parser_help)
+    module_name.set_up_parser(module_parser)
+
 
 # the main arugument parser
 def make_parser():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(help='sub-command help', dest='subcommand')
 
-    for subcommand, module in subcommands:
-        lustre_utils.add_module_parser(module, subcommand, subparsers)
+    for subcommand, module in subcommands.items():
+        add_module_parser(module, subcommand, subparsers)
 
     return parser
 
-
-    
-    # path subparser
-    help_string = ('get a path within the lustre source code. '
-                   'This command will attempt to find the root of the lustre source code '
-                   'using user given base names or default base name. '
-                   'The check to make sure that the given base name is actually lustre is very weak '
-                   'it just checks if the path is a non-empty directory. '
-                   'Then a relative path will be added to give the full name.')
-    sp = subparsers.add_parser('path', help=help_string)
-    sp.add_argument('-s', '--show', action='store_true',
-        help='show default base paths and relative paths.')
-    sp.add_argument('-b', '--base_paths', nargs='*',
-        help='set base paths, these paths will be used as the root of the lustre source code '
-        'if they are non-empty directories. If none of the given base paths '
-        'is plausibly the root of the lustre source code, the default base '
-        'paths will be checked next, unless --default is set to no.')
-    sp.add_argument('-d', '--default', choices=['yes', 'no', 'first'],
-        help='control the order in which base paths are checked. '
-        'if \'yes\' the default base paths will be checked after any given base paths. '
-        'if \'no\' the default base paths will not be checked. '
-        'if \'first\', the default base paths will be checked before any given base paths '
-        'the default is \'yes\'')
-    sp_mutex = sp.add_mutually_exclusive_group()
-    sp_mutex.add_argument('-n', '--name',
-        help='the name of some path in the lustre source tree. '
-        'It will br translated into a path relative to the base path '
-        'if it is a known name. To see the known names use --show.')
-    sp_mutex.add_argument('-r', '--relative', nargs='?', const='',
-        help='the relative path name. This will be added onto '
-        'the lustre root path making <lustre source root>/<relative path>')
-    sp.set_defaults(func=lustre_paths.main)
-
-
-    # bahsize
-    help_string = ('Create a bash script at the given path.'
-                   'If no file exists, create one.'
-                   'If a file does exist but does not start with'
-                   '#!, add #!/bin/bash and make executable,'
-                   'if #! already exists, do nothing.')
-    bsp = subparsers.add_parser('path', help=help_string)
-    subpar
-
-    
-    return parser
