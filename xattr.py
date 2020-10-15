@@ -11,7 +11,7 @@ import uuid
 # if this command is called directly,
 # or as the subcommand help string if called indirecly by lu
 # required for use by lu
-parser_help = '''Check if extended attributes (xattrs) are set and copied.'''
+parser_help = '''Get, set, and list extended attribute (xattrs)'''
 
 # a wrapper for set_up_parser_local
 # allows for the case that an existing parser is
@@ -54,17 +54,17 @@ def set_up_parser_local(parser):
 def main(args):
     if args.get('get'):
         path, name = args['get']
-        return os.getxatter(path, name)
+        val = os.getxattr(path, name)
+        print(str(val))
 
     elif args.get('set'):
         path, name, value = args['set']
-        os.setxattr(path, name, value)
-        return
+        os.setxattr(path, name, bytes(value, 'utf-8'))
 
     elif args.get('list'):
         path = args['list']
         print(os.listxattr(path))
-        return
+
         
     
 if __name__ == '__main__':
