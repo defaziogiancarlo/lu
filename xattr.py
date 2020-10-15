@@ -5,6 +5,7 @@ import subprocess
 import tempfile
 import uuid
 
+
 # the usage string for this command
 # it will be used as the main usage string
 # if this command is called directly,
@@ -27,6 +28,7 @@ def set_up_parser(parser=None):
     set_up_parser_local(parser)
     return parser
 
+
 # set up the parser for this command
 # the parser passed in is either one passed from
 # lu, or one just created for this module
@@ -35,63 +37,35 @@ def set_up_parser(parser=None):
 # can be written as if it's just for this module being
 # called directly but it will work for lu as well
 def set_up_parser_local(parser):
-    parser.add_argument('-s', '--source',
-                        help='the source directory to use')
-    parser.add_argument('-d', '--destination', required=True,
-                        help='the destination directory to use')
-    parser.add_argument('-b', '--bidirectional', action='store_true')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-g', '--get', nargs=2,
+                       metavar=('filename','xattr_name'),
+                       help='get the value of an xattr')
+    group.add_argument('-s', '--set', nargs=3,
+                       metavar=('filename', 'xattr_name', 'value'),
+                       help='set the value of an xattr')
+    group.add_argument('-l', '--list',
+                       metavar='filename',
+                       help='list the xattr names')
 
-
-def create_and_copy(source_dir, dest_dir):
-    '''create some files in source_dir, add some xattrs,
-    cp the files to dest_dir and see if the xattrs are retained.'''
-    xattr_name = 'user.job'
-    xattr_val = b'1234'
-
-    
-    # create a file in source_dir
-    filename = str(uuid.uuid4())
-    source_path = source_dir / filename
-    dest_path = dest_dir / filename
-
-    # make sure the directories exist
-    source_path.parent.mkdir(parents=True, exist_ok=True)
-    dest_path.parent.mkdir(parents=True, exist_ok=True)    
-    
-    # create and write to the source file
-    with open(source_path, 'w') as f:
-        text = '\n'.join(['Line ' + str(i) for i in range(1000)])
-        f.write(text)
-        
-    # add an xattr to the source file
-    os.setxattr(source_path, xattr_name, xattr_val)
-
-    # copy to destination 
-    subprocess.run(['cp', '--preserve=all', source_path, dest_path])
-
-    # read the xattr
-    copied_xattr = os.getxattr(dest_path, xattr_name)
-    print('hello')
-    print(str(copied_xattr))
-    
-    
 # the function that actually executes the command
 # this function deals with the arguments after they are
 # parsed and are made into a dictionary
 def main(args):
-    # make pathlib.Path for source
-    source_dir = args.get('source')
-    if source_dir is not None:
-        source_dir = pathlib.Path(source_dir).resolve()
-    else:
-        source_dir = pathlib.Path.cwd().resolve()
+    if args.get('get'):
+        path, name = args['get']
+        return os.getxatter(path, name)
 
-    dest_dir = pathlib.Path(args['destination']).resolve()
-    
-    create_and_copy(source_dir, dest_dir)
+    elif args.get('set'):
+        path, name, value = args['set']
+        os.setxattr(path, name, value)
+        return
 
-    if args.get('bidirectional'):
-        create_and_copy(dest_dir, source_dir)
+    elif args.get('list'):
+        path = args['list']
+        print(os.listxattr(path))
+        return
+        
     
 if __name__ == '__main__':
     parser = set_up_parser()

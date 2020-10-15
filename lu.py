@@ -43,12 +43,16 @@ import argparse
 import bashize
 import path
 import subcommand
+import checkxattr
+import xattr
 
 # store each subcommand with its corresponding module
 # they don't have to have the same name
 subcommands = {'path' : path,
                'bashize' : bashize,
                'subcommand' : subcommand,
+               'checkxattr' : checkxattr,
+               'xattr' : xattr,
 }
 
 def add_module_parser(module_name, subcommand_name, subparsers):
