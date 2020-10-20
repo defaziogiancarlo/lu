@@ -3,6 +3,9 @@ import pathlib
 import re
 import subprocess
 
+import path
+import utils
+
 # TODO, this is limited to 192.168 ... addresses, which may not work for different setups
 # should grab the correct ip regardless
 # TODO hostname can be gotten from the environment
@@ -10,14 +13,12 @@ def set_ip(hostname='vmlustre'):
     '''Set the ip address in /etc/hosts to 
     match that of ifconfig. This is for lustre/tests/llmount.sh'''
 
-    # need python 3.7 for capture_output
-    # ip_data = subprocess.run(['ifconfig'], 
-    #                          capture_output=True).decode()
-
-    # get ip address of this machine from ifconfig    
     ip_data = subprocess.run(['ifconfig'], 
-                             stdout=subprocess.PIPE).stdout.decode()
-    ifconfig_ip = ip4_pattern.search(ip_data).group('ip4')
+                             capture_output=True).stdout.decode()
+
+	# the only match is the ip address
+    ip4_pattern = re.compile(utils.ip4_re_str)
+    ifconfig_ip = ip4_pattern.search(ip_data).group(0)
     if ifconfig_ip is None:
         raise Exception('no usable ip in ifconfig')
 
@@ -31,7 +32,7 @@ def set_ip(hostname='vmlustre'):
 
     for line in hosts.split('\n'):
         if hostname in line:
-            etc_ip = ip4_pattern.match(line).group('ip4')
+            etc_ip = ip4_pattern.match(line).group(0)
 
     if etc_ip is None:
         raise Exception('no usable ip in /etc/hosts')
@@ -68,23 +69,25 @@ def setup_quota(fs_path='/mnt/lustre', user_name='defazio1'):
 
     # set grace periods for block and inode for users
     subprocess.run([lfs_path, 'setquota', '-t', '-u', '--block-grace', 
-                    '20w4d12h3m13s', '--inode-grace', '7200', '/mnt/lustre'])    
+                    '20w4d12h3m13s', '--inode-grace', '7200', fs_path])    
 
     # set block limits for the user
     subprocess.run([lfs_path, 'setquota', '-u', user_name, 
                     '--block-softlimit', '20M', 
                     '--block-hardlimit', '30M', 
-                    '/mnt/lustre'])
+                    fs_path])
     subprocess.run([lfs_path, 'setquota', '-u', user_name, 
                     '--inode-softlimit', '2048', 
                     '--inode-hardlimit', '3072', 
-                    '/mnt/lustre'])
+                    fs_path])
     
 def mount_lustre():
     '''check if lustre is mounted, if not,
     mount it.'''
     lsmod_output = subprocess.run(['lsmod'], 
                                 stdout=subprocess.PIPE).stdout.decode()
+
+    llmount_path = str(find_lustre_path('llmount'))
     if 'lustre' not in lsmod_output:
         # need to run llmount
         subprocess.run([llmount_path])
@@ -93,9 +96,11 @@ def unmount_lustre():
     '''check if lustre is mounted, if so, unmount it'''
     lsmod_output = subprocess.run(['lsmod'], 
                                 stdout=subprocess.PIPE).stdout.decode()
+
+    llmountcleanup_path = str(find_lustre_path('llmountcleanup'))
     if 'lustre' in lsmod_output:
         # need to run llmount
-        subprocess.run([llmountcleanup_path] )
+        subprocess.run([llmountcleanup_path])
         
     
 def build_lustre(user_name='defazio1'):
@@ -174,7 +179,7 @@ def set_up_parser_local(parser):
                         help=('Requires sudo.\n'
                               'unmount lustre if mounted using '
                               'lustre test setup llmountcleanup.sh'))
-)
+
     parser.add_argument('-r', '--remount')    
     
     
@@ -183,7 +188,20 @@ def set_up_parser_local(parser):
 # this function deals with the arguments after they are
 # parsed and are made into a dictionary
 def main(args):
-    pass
+
+    # if a host name is specified,
+    # use it when setting the ip
+    if args.get('set-ip'):
+            if args.get('name'):
+                set_ip(args['name'])
+            else:
+                set_ip()
+
+    if args.get('mount'):
+        
+
+    
+
 
 if __name__ == '__main__':
     parser = set_up_parser()

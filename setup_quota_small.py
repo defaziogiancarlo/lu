@@ -1,19 +1,19 @@
 import subprocess
 
 import set_colors
-import lustre_paths
+import path
 import lustre_utils
 
 # prerequisites:
 # expects lustre installed using llmount.sh at /mnt/lustre
 
 # get paths
-lustre = str(lustre_paths.find_lustre())
-lfs = str(lustre_paths.find_lustre(lr, 'lfs'))
-lctl = str(lustre_paths.find_lustre(lr, 'lctl'))
+lustre = str(path.find_lustre())
+lfs = str(path.find_lustre(lustre, 'lfs'))
+lctl = str(path.find_lustre(lustre, 'lctl'))
 
 # verify this is the right machine, slag3 by default
-check_machine('slag3')
+# check_machine('slag3')
 
 # make /mnt/lustre writeable
 os.chmod('/mnt/lustre', 0777)

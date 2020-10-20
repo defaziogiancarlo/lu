@@ -49,10 +49,17 @@ def set_up_parser(parser=None):
 
 # places lustre is likely to be
 default_lustre_paths = list(collections.OrderedDict.fromkeys([
+    # not using sudo
     pathlib.Path.home() / 'lustre-release',
     pathlib.Path.home() / 'lustre',
+    # lab
     pathlib.Path('/g/g0/defazio1') / 'lustre-release',
     pathlib.Path('/g/g0/defazio1') / 'lustre',
+    # vm
+    pathlib.Path('/home/defazio1') / 'lustre-release',
+    pathlib.Path('/home/defazio1') / 'lustre',
+    pathlib.Path('/home/gianni') / 'lustre-release',
+    pathlib.Path('/home/gianni') / 'lustre',
 ]))
 
 # important relative paths within lustre
@@ -116,6 +123,13 @@ def find_path(lustre_path, rel_path_name):
     if rel_path is None:
         return None
     return lustre_path / rel_path
+
+def find_lustre_path(rel_path_name):
+    '''guess the location of lustre
+    and find the path.'''
+    lustre_path = find_lustre()
+    return find_path(lustre_path, rel_path_name)
+        
 
 def main(args):
     '''Deal with arguments and call appropriate
