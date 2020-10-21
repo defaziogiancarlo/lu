@@ -47,6 +47,13 @@ def set_env():
         cfg_path = os.environ['HOME']
     cfg_path = pathlib.Path(cfg_path) / cfg_file_name
     
+    # if not file, don't set anything
+    if not cfg_path.is_file():
+        print('Warning: No lu configuration file found. '
+              'This is normal when setting up lu.',
+              file=sys.stderr)
+        return
+
     cfg_file_vals = None
     with open(cfg_path, 'r') as f:
         cfg_file_vals = json.load(f)
