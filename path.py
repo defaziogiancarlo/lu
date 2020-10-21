@@ -67,8 +67,8 @@ relative_paths = {
     'lustre' : '',
     'lctl' : 'lustre/utils/lctl',
     'lfs' : 'lustre/utils/lfs',
-    'llmount' : 'test/llmount.sh',
-    'llmountcleanup' : 'test/llmountcleanup.sh',
+    'llmount' : 'lustre/tests/llmount.sh',
+    'llmountcleanup' : 'lustre/tests/llmountcleanup.sh',
     'checkpatch' : 'contrib/scripts/checkpatch.pl',
 }
 

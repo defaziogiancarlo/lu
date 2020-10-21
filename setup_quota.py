@@ -59,6 +59,10 @@ def setup_quota(fs_path='/mnt/lustre', user_name='defazio1'):
     mnt = pathlib.Path(fs_path)
     mnt.chmod(0o777)
 
+    # find lctl
+    lctl_path = str(path.find_lustre_path('lctl'))
+    lfs_path = str(path.find_lustre_path('lfs'))
+
     # set up logging for quotas
     subprocess.run([lctl_path, 'set_param', 'debug=-1'])
     subprocess.run([lctl_path, 'set_param', 'subsystem_debug=lquota'])
@@ -85,9 +89,9 @@ def mount_lustre():
     '''check if lustre is mounted, if not,
     mount it.'''
     lsmod_output = subprocess.run(['lsmod'], 
-                                stdout=subprocess.PIPE).stdout.decode()
+                                  capture_output=True).stdout.decode()
 
-    llmount_path = str(find_lustre_path('llmount'))
+    llmount_path = str(path.find_lustre_path('llmount'))
     if 'lustre' not in lsmod_output:
         # need to run llmount
         subprocess.run([llmount_path])
@@ -95,20 +99,20 @@ def mount_lustre():
 def unmount_lustre():
     '''check if lustre is mounted, if so, unmount it'''
     lsmod_output = subprocess.run(['lsmod'], 
-                                stdout=subprocess.PIPE).stdout.decode()
+                                  capture_output=True).stdout.decode()
 
-    llmountcleanup_path = str(find_lustre_path('llmountcleanup'))
+    llmountcleanup_path = str(path.find_lustre_path('llmountcleanup'))
     if 'lustre' in lsmod_output:
-        # need to run llmount
         subprocess.run([llmountcleanup_path])
         
     
 def build_lustre(user_name='defazio1'):
     # build as defazio1
-    subprocess.run(['sudo', '-u', user_name, 'make', 'clean'], cwd=lustre_root)
-    subprocess.run(['sudo', '-u', user_name, 'sh', 'autogen.sh'], cwd=lustre_root)
-    subprocess.run(['sudo', '-u', user_name, './configure'], cwd=lustre_root)
-    subprocess.run(['sudo', '-u', user_name, 'make', '-j12'], cwd=lustre_root)
+    lustre_path = path.find_lustre()
+    subprocess.run(['sudo', '-u', user_name, 'make', 'clean'], cwd=lustre_path)
+    subprocess.run(['sudo', '-u', user_name, 'sh', 'autogen.sh'], cwd=lustre_path)
+    subprocess.run(['sudo', '-u', user_name, './configure'], cwd=lustre_path)
+    subprocess.run(['sudo', '-u', user_name, 'make', '-j12'], cwd=lustre_path)
 
 
 def setup_quota_test():
@@ -197,8 +201,8 @@ def main(args):
             else:
                 set_ip()
 
-    if args.get('mount'):
-        
+   # if args.get('mount'):
+   
 
     
 
