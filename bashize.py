@@ -5,6 +5,8 @@ import subprocess
 import sys
 import uuid
 
+import cfg
+
 # the usage string for this command
 # it will be used as the main usage string
 # if this command is called directly,

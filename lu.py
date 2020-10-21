@@ -32,26 +32,38 @@ from the argparse as a dict.
 See any of modules in 'subcommands' for examples. 
 '''
 
+# TODO pull in files from config file
+# username, lustre location(s), lu locations
+
 # include lu directory in path
 import os
 import sys
+# this doesn't work for root
+sys.path.append('/home/defazio1/lu')
 sys.path.append(os.environ['HOME'] + '/lu')
 
+ 
 import argparse
+
+import cfg
 
 # modules that implement subcommands
 import bashize
+import checkxattr
+import mount
 import path
 import subcommand
-import checkxattr
+import unmount
 import xattr
 
 # store each subcommand with its corresponding module
 # they don't have to have the same name
 subcommands = {'path' : path,
                'bashize' : bashize,
+               'mount' : mount,
                'subcommand' : subcommand,
                'checkxattr' : checkxattr,
+               'unmount' : unmount,
                'xattr' : xattr,
 }
 

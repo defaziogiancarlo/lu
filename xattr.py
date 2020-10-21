@@ -5,6 +5,8 @@ import subprocess
 import tempfile
 import uuid
 
+# NOTE the utilities setfattr, getfattr exist and can do all this
+# too. However they were intalled by default on ubuntu when I wrote this.
 
 # the usage string for this command
 # it will be used as the main usage string

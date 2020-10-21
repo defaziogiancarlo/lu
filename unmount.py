@@ -1,11 +1,24 @@
 import argparse
+import subprocess
+
+import path
+
+def unmount_lustre():
+    '''check if lustre is mounted, if so, unmount it'''
+    lsmod_output = subprocess.run(['lsmod'], 
+                                  capture_output=True).stdout.decode()
+
+    llmountcleanup_path = str(path.find_lustre_path('llmountcleanup'))
+    if 'lustre' in lsmod_output:
+        subprocess.run([llmountcleanup_path], check=True)
+
 
 # the usage string for this command
 # it will be used as the main usage string
 # if this command is called directly,
 # or as the subcommand help string if called indirecly by lu
 # required for use by lu
-parser_help = ('')
+parser_help = ('unmount lustre using the llmountcleanup.sh script.')
 
 # a wrapper for set_up_parser_local
 # allows for the case that an existing parser is
@@ -36,7 +49,8 @@ def set_up_parser_local(parser):
 # this function deals with the arguments after they are
 # parsed and are made into a dictionary
 def main(args):
-    pass
+    unmount_lustre()
+    
 
 if __name__ == '__main__':
     parser = set_up_parser()
