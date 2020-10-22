@@ -1,4 +1,3 @@
-
 __doc__ = '''
 Lustre Utilities - Scripts for Lustre development
 
@@ -32,16 +31,15 @@ from the argparse as a dict.
 See any of modules in 'subcommands' for examples. 
 '''
 
-# TODO pull in files from config file
-# username, lustre location(s), lu locations
-
 # include lu directory in path
 import os
 import sys
-# this doesn't work for root
-sys.path.append('/home/defazio1/lu')
-sys.path.append(os.environ['HOME'] + '/lu')
 
+# get the path to where are the files are
+# this should be set the top of the file
+# for an executable version, and not matter otherwise
+if 'lu_dir_path' in globals():
+    sys.path.append(lu_dir_path)
  
 import argparse
 

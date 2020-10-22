@@ -4,6 +4,10 @@ import sys
 
 command_template='''import argparse
 
+# cfg will attempt to retrive a configuration
+# file the first time it is imported
+import cfg
+
 # the usage string for this command
 # it will be used as the main usage string
 # if this command is called directly,
