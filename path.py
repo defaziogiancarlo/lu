@@ -8,7 +8,7 @@ import pathlib
 
 import utils
 
-
+import cfg
 
 parser_help =('get a path within the lustre source code. '
         'This command will attempt to find the root of the lustre source code '
@@ -47,20 +47,18 @@ def set_up_parser(parser=None):
     return parser
 
 
-# places lustre is likely to be
-default_lustre_paths = list(collections.OrderedDict.fromkeys([
-    # not using sudo
-    pathlib.Path.home() / 'lustre-release',
-    pathlib.Path.home() / 'lustre',
-    # lab
-    pathlib.Path('/g/g0/defazio1') / 'lustre-release',
-    pathlib.Path('/g/g0/defazio1') / 'lustre',
-    # vm
-    pathlib.Path('/home/defazio1') / 'lustre-release',
-    pathlib.Path('/home/defazio1') / 'lustre',
-    pathlib.Path('/home/gianni') / 'lustre-release',
-    pathlib.Path('/home/gianni') / 'lustre',
-]))
+def make_default_lustre_paths():
+    paths = []
+
+    # the easy case, it's set in the configuration file
+    if cfg.env.get('lustre_path'):
+        paths.append(pathlib.Path(cfg.env['lustre_path']))
+    else:
+        paths.append(pathlib.Path.home() / 'lustre-release')
+        paths.append(pathlib.Path.home() / 'lustre')
+    return paths
+
+default_lustre_paths = make_default_lustre_paths()
 
 # important relative paths within lustre
 relative_paths = {

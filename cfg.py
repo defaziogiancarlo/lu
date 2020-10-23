@@ -38,11 +38,9 @@ def set_env():
         else:
             # no configuration set
             # this program isn't set up for a user logged in as root
-            print('Warning: no lu configuration set. '
+            sys.exit('Warning: no lu configuration set. '
                   'lu is not meant for users logged in as root. '
-                  'If you\'re not logged in as root, this is a bug.',
-                  file=sys.stderr)
-            return
+                  'If you\'re not logged in as root, this is a bug.')
     else:
         cfg_path = os.environ['HOME']
     cfg_path = pathlib.Path(cfg_path) / cfg_file_name

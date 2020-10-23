@@ -1,7 +1,10 @@
 import subprocess
 
+import cfg
+
 import path
 import utils
+
 
 # prerequisites:
 # expects lustre installed using llmount.sh at /mnt/lustre

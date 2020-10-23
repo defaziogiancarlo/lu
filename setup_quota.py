@@ -3,6 +3,8 @@ import pathlib
 import re
 import subprocess
 
+import cfg
+
 import path
 import utils
 
@@ -52,9 +54,14 @@ def set_ip(hostname='vmlustre'):
         
 
 # TODO maybe get user_name from environment
-def setup_quota(fs_path='/mnt/lustre', user_name='defazio1'):
-    '''set up lustre for quotas.
-    '''
+def setup_quota(fs_path='/mnt/lustre', user_name=None):
+    '''set up lustre for quotas.'''
+
+    if user_name is None:
+        user_name = cfg.env.get('username')
+    if user_name is None:
+        sys.exit('ERROR: no username given or found in configuration file.')
+    
     # make the lustre file system writable
     mnt = pathlib.Path(fs_path)
     mnt.chmod(0o777)
@@ -106,8 +113,14 @@ def unmount_lustre():
         subprocess.run([llmountcleanup_path])
         
     
-def build_lustre(user_name='defazio1'):
-    # build as defazio1
+def build_lustre(user_name=None):
+
+    if user_name is None:
+        user_name = cfg.env.get('username')
+    if user_name is None:
+        sys.exit('ERROR: no username given or found in configuration file.')
+
+    # build as non-root user
     lustre_path = path.find_lustre()
     subprocess.run(['sudo', '-u', user_name, 'make', 'clean'], cwd=lustre_path)
     subprocess.run(['sudo', '-u', user_name, 'sh', 'autogen.sh'], cwd=lustre_path)
@@ -122,8 +135,14 @@ def setup_quota_test():
     #mount_lustre()
     setup_quota()
 
-def resetup_quota_test(full=False, user_name='defazio1'):
+def resetup_quota_test(full=False, user_name=None):
     '''assumes lustre needs to be remade and reinstalled'''
+
+    if user_name is None:
+        user_name = cfg.env.get('username')
+    if user_name is None:
+        sys.exit('ERROR: no username given or found in configuration file.')
+
     unmount_lustre()
     if full:
         subprocess.run(['sudo', '-u', user_name, 'make', 'clean'], cwd=lustre_root)
