@@ -6,7 +6,7 @@ import argparse
 import collections
 import pathlib
 
-import set_colors
+import utils
 
 
 
@@ -76,10 +76,10 @@ relative_paths = {
 def show_paths():
     '''Show all default base paths,  as well as relative path names
     and their corresponding paths.'''
-    set_colors.print_rgb((125,56,179), 'default base paths:')
+    utils.print_rgb((125,56,179), 'default base paths:')
     for p in default_lustre_paths:
         print(str(p))
-    set_colors.print_rgb((125,56,179), 'relative paths:')
+    utils.print_rgb((125,56,179), 'relative paths:')
     for n,p in relative_paths.items():
         print(n + ' -> \'' + p + '\'')
 

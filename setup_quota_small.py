@@ -1,8 +1,7 @@
 import subprocess
 
-import set_colors
 import path
-import lustre_utils
+import utils
 
 # prerequisites:
 # expects lustre installed using llmount.sh at /mnt/lustre

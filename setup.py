@@ -1,5 +1,9 @@
 import argparse
+import copy
+import json
+import os
 import pathlib
+import sys
 
 # cfg will attempt to retrive a configuration
 # file the first time it is imported
@@ -41,8 +45,8 @@ def set_up_parser_local(parser):
                        help=('pick a path to use for python. '
                        'otherwise \'which python3\' is used.'))
     parser.add_argument('-b', '--bin',
-                        help='pick a path to put the executable version of lu at,
-                        the default is ~/bin')
+                        help='pick a path to put the executable version of lu at, '
+                        'the default is ~/bin')
 
 
 def make_executable_lu(lu_path, lu_dir_path, python_path, executable_path):
@@ -52,16 +56,46 @@ def make_executable_lu(lu_path, lu_dir_path, python_path, executable_path):
     text = None
     with open(lu_path, 'r') as lu_file:
         text = lu_file.read()
-    
+
     # TODO make executable path dir if it doesn't exist
-    with open(executable, 'w') as executable_file:
-        executable_file.write('#!' + python_path + '\n')
-        executable_file.write(f'lu_dir_path = \'{lu_dir_path}\'\n')
+    executable_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(executable_path, 'w') as executable_file:
+        executable_file.write('#!' + python_path + '\n\n')
+        executable_file.write(f'lu_dir_path = \'{lu_dir_path}\'\n\n')
         executable_file.write(text)
+    executable_path.chmod(0o744)
     
+def make_config_file(lu_dir_path, python_path):
+    '''make config file and put in home directory.
+    sets default values:
+        username from environment
+        user_home from environment
+        lu_path from this file's parent
+        user_bin assumed to be ~/bin
+        python is the version of python currently running'''
+    if os.environ['USER'] == 'root':
+        # don't make configuration file
+        # it will belong to root, also this program shouldn't
+        # mess with the home directory of the root user
+        print('Warning: no lu configuration file made. '
+              'lu configuration file should not be made as root.',
+              file=sys.stderr)
+        return
+    else:
+        # put defaults into cfg.env
+            
+        env = copy.deepcopy(cfg.env)
+        env['username'] = os.environ['USER']
+        env['user_home'] = os.environ['HOME']
+        env['lu_dir_path'] = str(lu_dir_path)
+        env['user_bin'] = None
+        env['python'] = str(python_path)
 
-
-
+        config_path = pathlib.Path(os.environ['HOME']) / '.lu.json'
+        with open(config_path, 'w') as f:
+            json.dump(env, f, indent=2)
+        
+            
 # the function that actually executes the command
 # this function deals with the arguments after they are
 # parsed and are made into a dictionary
@@ -72,9 +106,14 @@ def main(args):
     lu_path = lu_dir_path / 'lu.py'
     python_path = args.get('python')
     if python_path is None:
-        python_path = subprocess.run(['which', 'python3'], 
-                                     capture_output=True,
-                                     check=True).stdout.decode()
+        # get this python
+        python_path = sys.executable
+
+    executable_path = pathlib.Path(os.environ['HOME']) / 'bin' / 'lu'
+
+    make_executable_lu(lu_path, lu_dir_path, python_path, executable_path)
+
+    make_config_file(lu_dir_path, python_path)
     # set lu.py to include the lu path
     # set lu.py to be run with python_path
     # make lu executable and put it in ~/bin, make ~/bin if it doesn't exist

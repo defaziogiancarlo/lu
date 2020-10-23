@@ -11,12 +11,12 @@ cfg_file_name = '.lu.json'
 # holds all possible configuration values
 # meant to be set whenever a script is called
 # and then can be used by scripts
-env = {"username"    : None,
-       "user_home"   : None,
-       "lustre_path" : None,
-       "lu_path"     : None,
-       "user_bin"    : None,
-       "python"      : None,
+env = {'username'    : None,
+       'user_home'   : None,
+       'lustre_path' : None,
+       'lu_dir_path'     : None,
+       'user_bin'    : None,
+       'python'      : None,
 }
 
 def set_env():
@@ -68,7 +68,6 @@ def set_env():
             print('warning: invalid config value \'{}\' in {}'.format(
                 str(key), str(cfg_path)))
 
-    print(env)
             
 # set env varables, this should only happen once
 set_env()
