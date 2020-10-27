@@ -44,7 +44,7 @@ can be run directly.
 python3 <subcommand>.py <flags/args>
 ```
 However, not all modules are subcommands.
-For example the [cfg](cfg.py) and [utils](utils.py) are not meant to
+For example the [cfg](cfg.py) and [lutils](lutils.py) are not meant to
 be run as commands and aren't listed as subcommands by `lu`.
 
 The subcommands must adhere to an interface to work

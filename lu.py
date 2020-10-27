@@ -48,6 +48,7 @@ import cfg
 # modules that implement subcommands
 import bashize
 import checkxattr
+import edquot
 import mount
 import path
 import subcommand
@@ -58,6 +59,7 @@ import xattr
 # they don't have to have the same name
 subcommands = {'path' : path,
                'bashize' : bashize,
+               'edquot' : edquot,
                'mount' : mount,
                'subcommand' : subcommand,
                'checkxattr' : checkxattr,
