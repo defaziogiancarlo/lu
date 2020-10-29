@@ -158,6 +158,140 @@ def check_over_quota(fs_path='/mnt/lustre'):
               file=sys.stderr)
     
 
+def get_pools(prefixed=False, fs_name='lustre'):
+    '''get the pools in a file system,
+    returns a list of their names without 
+    <filesystem>. prepended, unless prefixed=True'''
+    pools = subprocess.run([lctl_path, 'pool_list', fs_name],
+                           capture_output=True, 
+                           check=True,).stdout.decode().splitlines()[1:]
+
+    # the filesystem name is kept as a prefix
+    if prefixed:
+        return pools
+
+    # the filesytem prefix is removed
+    return [pool.split('.')[0] for pool in pools]
+
+
+def get_pool_osts(pool_name, filesystem='lustre', full_name=False):
+    '''get the OSTs in a pool, returns a list of numbers,
+    or if full_name=True, return full name given by lctl'''
+    # check if the pool name is prefixed by a file system name
+    # if not, prepend it
+    # just check for a '.'
+    # TODO use regex, need to know filesystem
+    if '.' not in pool_name:
+        pool_name = filesystem + '.' + pool_name
+
+    osts = subprocess.run([lctl_path, 'pool_list', pool_name],
+                           capture_output=True, 
+                           check=True,).stdout.decode().splitlines()[1:]
+
+    # the names given by lctl
+    if full_name:
+        return osts
+
+    # dig out the number
+    ost_name_pattern = r'[\w]+-OST(?P<number>[\da-fA-F]{4})_UUID'
+    ost_name_re = re.compile(ost_name_pattern)
+    # OST number are hexadecimal
+    ost_nums = []
+    for ost in osts:
+        num_string = ost_name_re.fullmatch(ost).group('number')
+        ost_nums.append(int(num_string, 16))
+    return ost_nums
+
+
+def setup_pools(fs_path='/mnt/lustre'):
+    ''' create an ost pool, and set quota on it'''
+    # create a pool for each OST, there should be 0 and 1
+    lctl_path = str(lutils.find_lustre_path('lctl'))
+    lfs_path = str(lutils.find_lustre_path('lfs'))
+
+    pool0_name = 'pool0'
+    pool1_name = 'pool1'
+
+    subprocess.run([lctl_path, 'pool_new', 'lustre.' + pool0_name],
+                   check=True)
+    subprocess.run([lctl_path, 'pool_new', 'lustre.' + pool1_name],
+                   check=True)
+
+    # now verify the pools exist, the 2nd and 3rd lines
+    # should just be the pools names
+    pools = subprocess.run([lctl_path, 'pool_list', 'lustre'],
+                           capture_output=True, 
+                           check=True,).stdout.decode().splitlines()[1:]
+    if pools == []:
+        sys.exit('failed to create pools')
+
+    if pools[0] != ('lustre.' + pool0_name) or pools[1] != ('lustre.' + pool1_name):
+        sys.exit('wrong pools created')
+
+    # now associate each pool with an OST
+    subprocess.run([lctl_path, 'pool_add', 'lustre.' + pool0_name, 'OST[0]'],
+                   check=True)
+    subprocess.run([lctl_path, 'pool_add', 'lustre.' + pool1_name, 'OST[1]'],
+                   check=True)
+
+    # check that OST added
+    osts = subprocess.run([lctl_path, 'pool_list', 'lustre.' + pool0_name],
+                           capture_output=True, 
+                           check=True,).stdout.decode().splitlines()[1:]
+    # should be just OST 0
+    if osts[0] != 'lustre-OST0000_UUID':
+        sys.exit('failed to add OST to pool')
+
+    # check that OST added
+    osts = subprocess.run([lctl_path, 'pool_list', 'lustre.' + pool1_name],
+                           capture_output=True, 
+                           check=True,).stdout.decode().splitlines()[1:]
+    # should be just OST 1
+    if osts[0] != 'lustre-OST0001_UUID':
+        sys.exit('failed to add OST to pool')
+
+    # now create a file for each pool
+    # now associate each pool with an OST
+    pool0_filename = pathlib.Path(fs_path) / 'pool0_file'
+    subprocess.run([lfs_path, 'setstripe', '--pool', pool0_name, pool0_filename],
+                   check=True)
+    pool1_filename = pathlib.Path(fs_path) / 'pool1_file'
+    subprocess.run([lfs_path, 'setstripe', '--pool', pool1_name, pool1_filename],
+                   check=True)
+
+    
+def remove_pools(filesystem='lustre'):
+
+    lctl_path = str(lutils.find_lustre_path('lctl'))
+    lfs_path = str(lutils.find_lustre_path('lfs'))
+
+    fs_path = pathlib.Path('/mnt') / filesystem
+
+    # delete everything in /mnt/<filesystem>
+    lutils.remove_dir_contens(fs_path)
+    
+    # find all pools, and all OSTs in each pool
+    # and remove all OSTs
+    pools = get_pools(prefixed=True)
+    for pool in pools:
+        osts = get_pool_osts(pool)
+        ost_string = 'OST[' + ','.join(map(str,osts)) + ']'
+        subprocess.run([lctl_path, 'pool_remove', 
+                        pool, ost_string], check=True)
+
+    # destroy the pools
+    for pool in pools:
+        subprocess.run([lctl_path, 'pool_destroy', pool],
+                       check=True)
+
+
+    
+def check_over_quota_pool():
+    pass
+
+def check_under_quota_pool():
+    pass
+
 
 
 
@@ -175,11 +309,13 @@ def test_edquot():
 # this function deals with the arguments after they are
 # parsed and are made into a dictionary
 def main(args):
-    #setup_test(reset=True)
+    setup_test(reset=True)
     #check_e_flag()
-    #setup_quota(butt='hole')
-    #check_under_quota()
-    write_to_lustre(666)
+    #setup_quota()
+    check_under_quota()
+    #write_to_lustre(666)
+    #setup_test()
+    setup_pools()
 
 ## Autogenerated by lu ##
 if __name__ == '__main__':

@@ -5,6 +5,7 @@ Basic utilities
 import re
 import os
 import pathlib
+import shutil
 import subprocess
 
 import cfg
@@ -94,14 +95,14 @@ def set_ip(hostname='vmlustre'):
         f.write(hosts)
 
 
-def mount_lustre():
+def mount_lustre(force=False):
     '''check if lustre is mounted, if not,
     mount it.'''
     lsmod_output = subprocess.run(['lsmod'], 
                                   capture_output=True).stdout.decode()
 
     llmount_path = str(find_lustre_path('llmount'))
-    if 'lustre' not in lsmod_output:
+    if 'lustre' not in lsmod_output or force:
         # need to run llmount
         subprocess.run([llmount_path], check=True)
 
@@ -207,4 +208,15 @@ def find_lustre_path(rel_path_name):
     lustre_path = find_lustre()
     return find_path(lustre_path, rel_path_name)
 
+
+def remove_dir_contents(dir_path):
+    '''remove the contents of a directory
+    but not the directory itself. Directory shouldn't contain
+    symlinks.'''
+    dir_path = pathlib.Path(dir_path)
+    for path in dir_path.glob('*'):
+        if path.is_dir:
+            shutil.rmtree(path)
+        else:
+            path.unlink()
 
