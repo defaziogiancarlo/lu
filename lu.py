@@ -51,16 +51,18 @@ import checkxattr
 import edquot
 import mount
 import path
+import retag
 import subcommand
 import unmount
 import xattr
 
 # store each subcommand with its corresponding module
 # they don't have to have the same name
-subcommands = {'path' : path,
-               'bashize' : bashize,
+subcommands = {'bashize' : bashize,
                'edquot' : edquot,
                'mount' : mount,
+               'path' : path,
+               'retag' : retag,
                'subcommand' : subcommand,
                'checkxattr' : checkxattr,
                'unmount' : unmount,
