@@ -17,22 +17,26 @@ def make_patch():
                          check=True).stdout.decode().strip()    
     kv = re.match(version_pattern, version).group('kernel')
 
+    print(kv)
+
     # find the series file
     series_file_name = None
     with open(lustre_path / 'lustre/kernel_patches/which_patch', 'r') as f:
-        for line in f.lines():
+        for line in f.readlines():
             if kv in line:
                 series_file_name = line.split()[0]
 
+    print(series_file_name)
+                
     # read the series file, and get full paths to each patch file
     series_path = lustre_path / 'lustre/kernel_patches' / series_file_name
     patch_files = None
     with open(seried_path, 'r') as f:
         patch_dir = lustre_path / 'kernel_patches/patches'
-        patch_file_lines = f.lines()
-        patch_files = [path_dir / line for line in patch_file_lines]
+        patch_files = [path_dir / line for line in f.readlines()]
 
-    
+
+    print(patch_files)
     
 
 if __name__ == '__main__':
