@@ -10,7 +10,7 @@ import lutils
 
 def make_patch():
 
-    version_pattern = r'(?P<kernel>.*)\.[^\.]+$'
+    version_pattern = r'(?P<kernel>[^_]*)(?:_\d)?\.[^\.]+$'
     
     lustre_path = lutils.find_lustre()
 
