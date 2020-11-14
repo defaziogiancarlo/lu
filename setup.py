@@ -88,7 +88,7 @@ def make_config_file(lu_dir_path, python_path):
         env['username'] = os.environ['USER']
         env['user_home'] = os.environ['HOME']
         env['lu_dir_path'] = str(lu_dir_path)
-        env['user_bin'] = None
+        env['user_bin'] = str(pathlib.Path(os.environ['HOME']) / 'bin')
         env['python'] = str(python_path)
 
         config_path = pathlib.Path(os.environ['HOME']) / '.lu.json'

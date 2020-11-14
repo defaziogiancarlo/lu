@@ -13,6 +13,7 @@ import lutils
 def setup_quota(fs_path='/mnt/lustre', user_name=None):
     '''set up lustre for quotas.'''
 
+    print('setting up quota')
     if user_name is None:
         user_name = cfg.env.get('username')
     if user_name is None:
@@ -23,8 +24,8 @@ def setup_quota(fs_path='/mnt/lustre', user_name=None):
     mnt.chmod(0o777)
 
     # find lctl
-    lctl_path = str(path.find_lustre_path('lctl'))
-    lfs_path = str(path.find_lustre_path('lfs'))
+    lctl_path = str(lutils.find_lustre_path('lctl'))
+    lfs_path = str(lutils.find_lustre_path('lfs'))
 
     # set up logging for quotas
     subprocess.run([lctl_path, 'set_param', 'debug=-1'])
@@ -132,18 +133,20 @@ def set_up_parser_local(parser):
                         help=('the hostname, this will be '
                               'the environment variable $HOSTNAME '
                               'by default.'))
-    parser.add_argument('-m', '--mount',
-                        help=('Requires sudo.\n'
-                        'mount lustre of not already mounted '
-                        'using lustre test setup llmount.sh'))
-    parser.add_argument('-u', '--unmount',
-                        help=('Requires sudo.\n'
-                              'unmount lustre if mounted using '
-                              'lustre test setup llmountcleanup.sh'))
+    # parser.add_argument('-m', '--mount',
+    #                     help=('Requires sudo.\n'
+    #                     'mount lustre of not already mounted '
+    #                     'using lustre test setup llmount.sh'))
+    # parser.add_argument('-u', '--unmount',
+    #                     help=('Requires sudo.\n'
+    #                           'unmount lustre if mounted using '
+    #                           'lustre test setup llmountcleanup.sh'))
 
-    parser.add_argument('-r', '--remount')    
+    #parser.add_argument('-r', '--remount')    
     
-    
+
+    parser.add_argument('-t', '--test', action='store_true',
+                        help='set the default quota setting for default user')
 
 # the function that actually executes the command
 # this function deals with the arguments after they are
@@ -157,6 +160,9 @@ def main(args):
                 lutils.set_ip(args['name'])
             else:
                 lutils.set_ip()
+
+    if args.get('test'):
+        setup_quota()
 
    # if args.get('mount'):
    

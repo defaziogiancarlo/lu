@@ -52,6 +52,7 @@ import edquot
 import mount
 import path
 import retag
+import quota
 import subcommand
 import unmount
 import xattr
@@ -63,6 +64,7 @@ subcommands = {'bashize' : bashize,
                'mount' : mount,
                'path' : path,
                'retag' : retag,
+               'quota' : quota,
                'subcommand' : subcommand,
                'checkxattr' : checkxattr,
                'unmount' : unmount,
