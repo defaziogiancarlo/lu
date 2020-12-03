@@ -52,15 +52,19 @@ def check_machine(name):
 # setting up lustre
 # TODO, this is limited to 192.168 ... addresses, which may not work for different setups
 # should grab the correct ip regardless
-# TODO hostname can be gotten from the environment
-def set_ip(hostname='vmlustre'):
+def set_ip(hostname=None):
     '''Set the ip address in /etc/hosts to 
     match that of ifconfig. This is for lustre/tests/llmount.sh'''
+
+    if hostname is None:
+        hostname = os.environ['HOSTNAME']
+
+    print(hostname)
 
     ip_data = subprocess.run(['ifconfig'], 
                              capture_output=True).stdout.decode()
 
-	# the only match is the ip address
+    # the only match is the ip address
     ip4_pattern = re.compile(ip4_re_str)
     ifconfig_ip = ip4_pattern.search(ip_data).group(0)
     if ifconfig_ip is None:
@@ -76,7 +80,9 @@ def set_ip(hostname='vmlustre'):
 
     for line in hosts.split('\n'):
         if hostname in line:
-            etc_ip = ip4_pattern.match(line).group(0)
+            # avoid commented lines
+            if line.strip()[0] != '#':
+                etc_ip = ip4_pattern.match(line).group(0)
 
     if etc_ip is None:
         raise Exception('no usable ip in /etc/hosts')
@@ -98,6 +104,10 @@ def set_ip(hostname='vmlustre'):
 def mount_lustre(force=False):
     '''check if lustre is mounted, if not,
     mount it.'''
+
+    # the ip frequently changes for vms
+    set_ip()
+
     lsmod_output = subprocess.run(['lsmod'], 
                                   capture_output=True).stdout.decode()
 
@@ -159,6 +169,7 @@ lustre_relative_paths = {
     'llmount' : 'lustre/tests/llmount.sh',
     'llmountcleanup' : 'lustre/tests/llmountcleanup.sh',
     'checkpatch' : 'contrib/scripts/checkpatch.pl',
+    'auster' : 'lustre/tests/auster'
 }
 
 def find_lustre(paths=None, check_defaults=None, check_defaults_first=None):

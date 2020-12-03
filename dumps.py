@@ -13,19 +13,50 @@ import pathlib
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', 1000)
 
-
 # grab a bunch of file names
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', '--paths', nargs='*',
                     help='the paths to all the kernel dump files')
 
-
 # subsystems as defined by lustre in ~/lustre-release/lnet/include/uapi/linux/lnet/
-subsystems = {
-    'lnet' : 0x400,
-    'lnd'  : 0x800,
-}
+# these are bits in luster
+subsystem_names = [
+    'undefined', 
+    'mdc', 
+    'mds', 
+    'osc', 
+    'ost', 
+    'class', 
+    'log', 
+    'llite', 
+    'rpc', 
+    'mgmt', 
+    'lnet', 
+    'lnd', 
+    'pinger', 
+    'filter',
+    'libcfs', 
+    'echo', 
+    'ldlm', 
+    'lov', 
+    'lquota', 
+    'osd', 
+    'lfsck',
+    'snapshot', 
+    '', 
+    'lmv', 
+    '', 
+    'sec', 
+    'gss', 
+    '', 
+    'mgc', 
+    'mgs',
+    'fid', 
+    'fld',
+]
 
+# give each name a single bit and skip the empty string names
+subsystems = {name : 2**i for i,name in enumerate(subsystem_names) if name}
 
 # subsystemReStr   = r'(?P<subsystem>\d+)'
 # debugMaskReStr   = r'(?P<debug_mask>\d+)'
@@ -88,7 +119,7 @@ def file_to_dataframe(path, full_path=False):
     types = {'subsystem'    : str, # np.uint32, # not used because converter is used
              'debug_mask'   : str, # np.uint32, # not used because converter is used
              'smp_id'       : str,
-             #'time'         : np.float64,
+#             'time'         : np.float64,
              'stack_size'   : np.uint64,
              'pid'          : np.int32,
              'host_pid'     : np.int32,
@@ -159,31 +190,33 @@ def regex_search(df, regex_string, cols):
     rdf = pd.concat(map(lambda x: df[df[x].str.contains(regex_string)], cols))
     return rdf.drop_duplicates()
     
+
         
 
 
 
 if __name__ == '__main__':
+    pass
     #jj = '00000400:02000000:25.0F:1598375394.790019:0:29281:0:(libcfs_cpu.c:1234:cfs_cpu_init()) HW NUMA nodes: 2, HW CPU cores: 32, npartitions: 2'
     #log_to_fields(jj)
     #df = file_to_dataframe('/g/g0/defazio1/tasks/2020_8__lnet_drops/toss-4887-dropped-lnet/dk.dmesg.copper31.1600728485')
-    paths_hard = ['/home/defazio1/lnet_logs/toss-4887-dropped-lnet/dk.dmesg.copper31.1600727112',
-                  '/home/defazio1/lnet_logs/zrelic5.lustre212.2020-09-21/dk.dmesg.zrelic5.1600728607']
+#     paths_hard = ['/home/defazio1/lnet_logs/toss-4887-dropped-lnet/dk.dmesg.copper31.1600727112',
+#                   '/home/defazio1/lnet_logs/zrelic5.lustre212.2020-09-21/dk.dmesg.zrelic5.1600728607']
 
 
-#    paths_hard = ['/home/defazio1/lnet_logs/toss-4887-dropped-lnet/test_copper31',
-#                  '/home/defazio1/lnet_logs/zrelic5.lustre212.2020-09-21/test_zrelic']
+# #    paths_hard = ['/home/defazio1/lnet_logs/toss-4887-dropped-lnet/test_copper31',
+# #                  '/home/defazio1/lnet_logs/zrelic5.lustre212.2020-09-21/test_zrelic']
     
-    args = parser.parse_args()
-    paths = vars(args).get('paths')
-    if paths is None:
-        paths = paths_hard
+#     args = parser.parse_args()
+#     paths = vars(args).get('paths')
+#     if paths is None:
+#         paths = paths_hard
     
-    #    df0 = file_to_dataframe(paths[0])
-    #    df1 = file_to_dataframe(paths[1])
-    print(paths)
+#     #    df0 = file_to_dataframe(paths[0])
+#     #    df1 = file_to_dataframe(paths[1])
+#     print(paths)
     
-    df = files_to_dataframe(paths)
+#     df = files_to_dataframe(paths)
 
     #print(df)
     # with open('test_file', 'r') as f:
