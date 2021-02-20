@@ -1,9 +1,10 @@
 import argparse
 import copy
-import json
 import os
 import pathlib
 import sys
+
+import yaml
 
 # cfg will attempt to retrive a configuration
 # file the first time it is imported
@@ -15,7 +16,7 @@ import cfg
 # or as the subcommand help string if called indirecly by lu
 # required for use by lu
 parser_help = '''Install lu on your system. This will create
-a configuration file at \'~/.lu.json\' and put an executable
+a configuration file at \'~/.lu.yaml\' and put an executable
 version of lu in \'~/bin\'.'''
 
 # a wrapper for set_up_parser_local
@@ -91,10 +92,10 @@ def make_config_file(lu_dir_path, python_path):
         env['user_bin'] = str(pathlib.Path(os.environ['HOME']) / 'bin')
         env['python'] = str(python_path)
 
-        config_path = pathlib.Path(os.environ['HOME']) / '.lu.json'
+        config_path = pathlib.Path(os.environ['HOME']) / '.lu.yaml'
         with open(config_path, 'w') as f:
-            json.dump(env, f, indent=2)
-        
+            dump_text = yaml.dump(env)
+            f.write(dump_text)
             
 # the function that actually executes the command
 # this function deals with the arguments after they are
@@ -118,7 +119,7 @@ def main(args):
     # set lu.py to be run with python_path
     # make lu executable and put it in ~/bin, make ~/bin if it doesn't exist
     # if making ~/bin, warn user and say that it should be put into PATH
-    # create .lu.json and initialize it with default values
+    # create .lu.yaml and initialize it with default values
 
 
 

@@ -22,24 +22,24 @@ os.chmod('/mnt/lustre', 0777)
 
 # set lustre debug logs to quotas
 subprocess.run([lctl, 'set_param', 'debug=-1'],
-               capture_output=True,
+               stdout=subprocess.PIPE,
                check=True)
 subprocess.run([lctl, 'set_param', 'subsytem_debug=-lquota'],
-               capture_output=True,
+               stdout=subprocess.PIPE,
                check=True)
 
 # turn on quotas for osts and mdts
 subprocess.run([lctl, 'conf_param', 'lustre.quota.ost=u'],
-               capture_output=True,
+               stdout=subprocess.PIPE,
                check=True)
 subprocess.run([lctl, 'conf_param', 'lustre.quota.mdt=u'],
-               capture_output=True,
+               stdout=subprocess.PIPE,
                check=True)
 
 
 # set 1 min grace period for block and inode for users
 subprocess.run([lctl, 'conf_param', 'lustre.quota.mdt=u'],
-               capture_output=True,
+               stdout=subprocess.PIPE,
                check=True)
 
 

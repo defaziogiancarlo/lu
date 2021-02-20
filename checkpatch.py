@@ -13,7 +13,7 @@ def main(filename):
     checkpatch = lustre_paths.find_path('checkpatch')
     if checkpath is not None:
         subprocess.run([checkpatch, filename],
-                       capture_output=True,
+                       stdout=subprocess.PIPE,
                        check=True)
 
 if __name__ == '__main__':

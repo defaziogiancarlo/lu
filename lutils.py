@@ -62,7 +62,7 @@ def set_ip(hostname=None):
     print(hostname)
 
     ip_data = subprocess.run(['ifconfig'], 
-                             capture_output=True).stdout.decode()
+                             stdout=subprocess.PIPE).stdout.decode()
 
     # the only match is the ip address
     ip4_pattern = re.compile(ip4_re_str)
@@ -109,7 +109,7 @@ def mount_lustre(force=False):
     set_ip()
 
     lsmod_output = subprocess.run(['lsmod'], 
-                                  capture_output=True).stdout.decode()
+                                  stdout=subprocess.PIPE).stdout.decode()
 
     llmount_path = str(find_lustre_path('llmount'))
     if 'lustre' not in lsmod_output or force:
@@ -119,7 +119,7 @@ def mount_lustre(force=False):
 def unmount_lustre():
     '''check if lustre is mounted, if so, unmount it'''
     lsmod_output = subprocess.run(['lsmod'], 
-                                  capture_output=True).stdout.decode()
+                                  stdout=subprocess.PIPE).stdout.decode()
 
     llmountcleanup_path = str(find_lustre_path('llmountcleanup'))
     if 'lustre' in lsmod_output:

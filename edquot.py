@@ -121,7 +121,7 @@ def check_under_quota(fs_path='/mnt/lustre'):
     user_name = cfg.env.get('username')
     quota_status = subprocess.run([lfs_path, 'quota', '-e', 
                                    '-u', user_name, fs_path],
-                                  capture_output=True, 
+                                  stdout=subprocess.PIPE, 
                                   check=True).stdout.decode().strip()
     expected_status = f'{user_name} under quota on {fs_path}'
     if quota_status != expected_status:
@@ -149,7 +149,7 @@ def check_over_quota(fs_path='/mnt/lustre'):
     user_name = cfg.env.get('username')
     quota_status = subprocess.run([lfs_path, 'quota', '-e', 
                                    '-u', user_name, fs_path],
-                                  capture_output=True, 
+                                  stdout=subprocess.PIPE, 
                                   check=True).stdout.decode().strip()
     expected_status = f'{user_name} under quota on {fs_path}'
     if quota_status != expected_status:
@@ -163,7 +163,7 @@ def get_pools(prefixed=False, fs_name='lustre'):
     returns a list of their names without 
     <filesystem>. prepended, unless prefixed=True'''
     pools = subprocess.run([lctl_path, 'pool_list', fs_name],
-                           capture_output=True, 
+                           stdout=subprocess.PIPE, 
                            check=True,).stdout.decode().splitlines()[1:]
 
     # the filesystem name is kept as a prefix
@@ -185,7 +185,7 @@ def get_pool_osts(pool_name, filesystem='lustre', full_name=False):
         pool_name = filesystem + '.' + pool_name
 
     osts = subprocess.run([lctl_path, 'pool_list', pool_name],
-                           capture_output=True, 
+                           stdout=subprocess.PIPE, 
                            check=True,).stdout.decode().splitlines()[1:]
 
     # the names given by lctl
@@ -220,7 +220,7 @@ def setup_pools(fs_path='/mnt/lustre'):
     # now verify the pools exist, the 2nd and 3rd lines
     # should just be the pools names
     pools = subprocess.run([lctl_path, 'pool_list', 'lustre'],
-                           capture_output=True, 
+                           stdout=subprocess.PIPE, 
                            check=True,).stdout.decode().splitlines()[1:]
     if pools == []:
         sys.exit('failed to create pools')
@@ -236,7 +236,7 @@ def setup_pools(fs_path='/mnt/lustre'):
 
     # check that OST added
     osts = subprocess.run([lctl_path, 'pool_list', 'lustre.' + pool0_name],
-                           capture_output=True, 
+                           stdout=subprocess.PIPE, 
                            check=True,).stdout.decode().splitlines()[1:]
     # should be just OST 0
     if osts[0] != 'lustre-OST0000_UUID':
@@ -244,7 +244,7 @@ def setup_pools(fs_path='/mnt/lustre'):
 
     # check that OST added
     osts = subprocess.run([lctl_path, 'pool_list', 'lustre.' + pool1_name],
-                           capture_output=True, 
+                           stdout=subprocess.PIPE, 
                            check=True,).stdout.decode().splitlines()[1:]
     # should be just OST 1
     if osts[0] != 'lustre-OST0001_UUID':

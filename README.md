@@ -21,12 +21,12 @@ gianni@computer:~$ python3 setup.py
 ```
 This will create `~/bin/lu` which is the executable version of `lu.py` with some
 extra information for the python version and the location of where the lu repo is.
-It will also create `~/.lu.json` which is the lu configuration file. This file will
+It will also create `~/.lu.yaml` which is the lu configuration file. This file will
 be used even when lu is used with sudo.
 
 ## Configuration
 
-The configuration file will be a `~/.lu.json` after running the setup script.
+The configuration file will be a `~/.lu.yaml` after running the setup script.
 It will be filled with default values. The important one that needs to be set is
 the location of the lustre repo. For all path values in the configurations file,
 absolute paths should be used.

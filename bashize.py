@@ -69,7 +69,7 @@ def main(args):
 
     # get bash's path
     which_bash_path = subprocess.run(['which', 'bash'],
-                                     capture_output=True,
+                                     stdout=subprocess.PIPE,
                                      check=True)
     shebangbash = '#!' + which_bash_path.stdout.decode() + '\n'
 

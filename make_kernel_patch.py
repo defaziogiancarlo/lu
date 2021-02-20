@@ -15,7 +15,7 @@ def make_patch():
     lustre_path = lutils.find_lustre()
 
     # get kernel version
-    version = subprocess.run(['uname', '-r'], capture_output=True,
+    version = subprocess.run(['uname', '-r'], stdout=subprocess.PIPE,
                          check=True).stdout.decode().strip()    
     kv = re.match(version_pattern, version).group('kernel')
 

@@ -1,12 +1,13 @@
 __doc__ = '''a place to hold configuration variables'''
 
-import json
 import os
 import pathlib
 import pwd
 import sys
 
-cfg_file_name = '.lu.json'
+import yaml
+
+cfg_file_name = '.lu.yaml'
 
 # holds all possible configuration values
 # meant to be set whenever a script is called
@@ -21,7 +22,7 @@ env = {'username'    : None,
 
 def set_env():
     '''attempt to set environment variables.
-    will look for .lu.json'''
+    will look for .lu.yaml'''
     # find the cfg_path
     cfg_path = None
     # check if root, if root, check for SUDO_USER
@@ -54,7 +55,7 @@ def set_env():
 
     cfg_file_vals = None
     with open(cfg_path, 'r') as f:
-        cfg_file_vals = json.load(f)
+        cfg_file_vals = yaml.load(f, Loader=yaml.Loader)
 
     # set the values in env
     for key in env.keys():
