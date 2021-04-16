@@ -45,7 +45,7 @@ LR_CLIENT_SIZE = 128
 # but that 288 depends on LR_EXPIRE_INTERVALS, so it's dumb.
 lr_server_data_format_list = [
     '<',   # little endian
-    '40B', # __u8  lsd_uuid[40];    /* server UUID */
+    '40s', # __u8  lsd_uuid[40];    /* server UUID */
     'Q',   # __u64 lsd_last_transno;    /* last completed transaction ID */
     'Q',   # __u64 lsd_compat14;    /* reserved - compat with old last_rcvd */
     'Q',   # __u64 lsd_mount_count;     /* incarnation number */
@@ -130,7 +130,7 @@ def read_server_data(b):
 # };
 
 lsd_client_data_format_list = [
-    '40B', # __u8  lcd_uuid[40];   /* client UUID */
+    '40s', # __u8  lcd_uuid[40];   /* client UUID */
     'Q',   # __u64 lcd_last_transno;   /* last completed transaction ID */
     'Q',   # __u64 lcd_last_xid;   /* xid for the last transaction */
     'I',   # __u32 lcd_last_result;    /* result from last RPC */
@@ -176,6 +176,10 @@ def read_client_data(b):
     client_data = struct.unpack(lsd_client_data_format_padded, b)
     return {n : d for n,d in zip(client_names, client_data)}
 
+def read_clients_data(b):
+    client_datas = struct.iter_unpack(lsd_client_data_format_padded, b)
+    return [{n : d for n,d in zip(client_names, client_data)} for client_data in client_datas]
+
 def read_server_from_path(path):
     path = pathlib.Path(path)
     b = None
@@ -183,3 +187,11 @@ def read_server_from_path(path):
         b = f.read()
     server = read_server_data(b[:LR_SERVER_SIZE])
     return server
+
+def read_clients_from_path(path):
+    path = pathlib.Path(path)
+    b = None
+    with open(path, 'rb') as f:
+        b = f.read()
+    clients = read_clients_data(b[LR_CLIENT_START:])
+    return clients
