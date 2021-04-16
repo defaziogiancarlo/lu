@@ -44,7 +44,7 @@ def check_machine(name):
     machine = os.environ['HOSTNAME']
     if machine != name:
         raise AssertionError(
-            'Using the wrong machine, ' 
+            'Using the wrong machine, '
             'currently using {}, '
             'should be using {}.'.format(machine, name))
 
@@ -53,7 +53,7 @@ def check_machine(name):
 # TODO, this is limited to 192.168 ... addresses, which may not work for different setups
 # should grab the correct ip regardless
 def set_ip(hostname=None):
-    '''Set the ip address in /etc/hosts to 
+    '''Set the ip address in /etc/hosts to
     match that of ifconfig. This is for lustre/tests/llmount.sh'''
 
     if hostname is None:
@@ -61,7 +61,7 @@ def set_ip(hostname=None):
 
     print(hostname)
 
-    ip_data = subprocess.run(['ifconfig'], 
+    ip_data = subprocess.run(['ifconfig'],
                              stdout=subprocess.PIPE).stdout.decode()
 
     # the only match is the ip address
@@ -108,7 +108,7 @@ def mount_lustre(force=False):
     # the ip frequently changes for vms
     set_ip()
 
-    lsmod_output = subprocess.run(['lsmod'], 
+    lsmod_output = subprocess.run(['lsmod'],
                                   stdout=subprocess.PIPE).stdout.decode()
 
     llmount_path = str(find_lustre_path('llmount'))
@@ -118,14 +118,14 @@ def mount_lustre(force=False):
 
 def unmount_lustre():
     '''check if lustre is mounted, if so, unmount it'''
-    lsmod_output = subprocess.run(['lsmod'], 
+    lsmod_output = subprocess.run(['lsmod'],
                                   stdout=subprocess.PIPE).stdout.decode()
 
     llmountcleanup_path = str(find_lustre_path('llmountcleanup'))
     if 'lustre' in lsmod_output:
         subprocess.run([llmountcleanup_path], check=True)
-        
-    
+
+
 def build_lustre(user_name=None, full=True):
     '''Build lustre, if full is set to false, only do that make step'''
 
@@ -230,4 +230,3 @@ def remove_dir_contents(dir_path):
             shutil.rmtree(path)
         else:
             path.unlink()
-
