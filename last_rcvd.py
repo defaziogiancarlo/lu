@@ -102,7 +102,7 @@ def read_server_data(b):
     '''Convert the server data from a struct to a
     dict.
     '''
-    server_data = struct.unpack(b)
+    server_data = struct.unpack(lr_server_data_format_padded, b)
     return {n : d for n,d in zip(server_names, server_data)}
 
 # client struct from the C code
@@ -172,5 +172,13 @@ def read_client_data(b):
     '''Convert the client data from a struct to a
     dict.
     '''
-    client_data = struct.unpack(b)
+    client_data = struct.unpack(lsd_client_data_format_padded, b)
     return {n : d for n,d in zip(client_names, client_data)}
+
+def read_server_from_path(path):
+    path = pathlib.Path(path)
+    b = None
+    with open(path, 'rb') as f:
+        b = f.read()
+    server = read_server_data(b[:8192])
+    return server
