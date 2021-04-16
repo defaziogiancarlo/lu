@@ -180,5 +180,5 @@ def read_server_from_path(path):
     b = None
     with open(path, 'rb') as f:
         b = f.read()
-    server = read_server_data(b[:8192])
+    server = read_server_data(b[LR_SERVER_SIZE])
     return server
