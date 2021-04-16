@@ -2,6 +2,7 @@
 Process the last_rcvd file in lustre
 '''
 
+import pathlib
 import struct
 
 import yaml
@@ -180,5 +181,5 @@ def read_server_from_path(path):
     b = None
     with open(path, 'rb') as f:
         b = f.read()
-    server = read_server_data(b[LR_SERVER_SIZE])
+    server = read_server_data(b[:LR_SERVER_SIZE])
     return server
