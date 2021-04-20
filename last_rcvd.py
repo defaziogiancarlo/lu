@@ -76,27 +76,27 @@ padding_size = LR_SERVER_SIZE - struct.calcsize(lr_server_data_format)
 lr_server_data_format_padded = lr_server_data_format + str(padding_size) + 'B'
 
 server_names = [
-    'lsd_uuid',
-    'lsd_last_transno',
-    'lsd_compat14',
-    'lsd_mount_count'  ,
-    'lsd_feature_compat' ,
-    'lsd_feature_rocompat',
-    'lsd_feature_incompat',
-    'lsd_server_size',
-    'lsd_client_start',
-    'lsd_client_size',
-    'lsd_subdir_count',
-    'lsd_catalog_oid',
-    'lsd_catalog_ogen',
-    'lsd_peeruuid',
-    'lsd_osd_index',
-    'lsd_padding1',
-    'lsd_start_epoch',
-    'lsd_trans_table',
-    'lsd_trans_table_time',
-    'lsd_expire_intervals',
-    'lsd_padding',
+    'uuid',
+    'last_transno',
+    'compat14',
+    'mount_count'  ,
+    'feature_compat' ,
+    'feature_rocompat',
+    'feature_incompat',
+    'server_size',
+    'client_start',
+    'client_size',
+    'subdir_count',
+    'catalog_oid',
+    'catalog_ogen',
+    'peeruuid',
+    'osd_index',
+    'padding1',
+    'start_epoch',
+    'trans_table',
+    'trans_table_time',
+    'expire_intervals',
+    'padding',
 ]
 
 def read_server_data(b):
@@ -104,8 +104,9 @@ def read_server_data(b):
     dict.
     '''
     server_data = struct.unpack(lr_server_data_format_padded, b)
-    return {n : d for n,d in zip(server_names, server_data)}
-
+    x =  {n : d for n,d in zip(server_names, server_data)}
+    x['uuid'] = x['uuid'].decode()
+    return x
 # client struct from the C code
 # /* Data stored per client in the last_rcvd file. In le32 order. */
 # struct lsd_client_data {
@@ -154,19 +155,19 @@ padding_size = LR_CLIENT_SIZE - struct.calcsize(lsd_client_data_format)
 lsd_client_data_format_padded = lsd_client_data_format + str(padding_size) + 'B'
 
 client_names = [
-    'lcd_uuid',
-    'lcd_last_transno',
-    'lcd_last_xid',
-    'lcd_last_result',
-    'lcd_last_data',
-    'lcd_last_close_transno',
-    'lcd_last_close_xid',
-    'lcd_last_close_result',
-    'lcd_last_close_data',
-    'lcd_pre_versions',
-    'lcd_last_epoch',
-    'lcd_generation',
-    'lcd_padding',
+    'uuid',
+    'last_transno',
+    'last_xid',
+    'last_result',
+    'last_data',
+    'last_close_transno',
+    'last_close_xid',
+    'last_close_result',
+    'last_close_data',
+    'pre_versions',
+    'last_epoch',
+    'generation',
+    'padding',
 ]
 
 def read_client_data(b):
@@ -178,7 +179,7 @@ def read_client_data(b):
 
 def read_clients_data(b):
     client_datas = struct.iter_unpack(lsd_client_data_format_padded, b)
-    return [{n : d for n,d in zip(client_names, client_data)} for client_data in client_datas]
+    return [{n : d.decode() if n == 'uuid' else d for n,d in zip(client_names, client_data)} for client_data in client_datas]
 
 def read_server_from_path(path):
     path = pathlib.Path(path)
@@ -195,3 +196,20 @@ def read_clients_from_path(path):
         b = f.read()
     clients = read_clients_data(b[LR_CLIENT_START:])
     return clients
+
+def to_yaml(infile, outfile):
+    '''Read in a last_rcvd file and output to yaml'''
+    infile = pathlib.Path(infile)
+    outfile = pathlib.Path(outfile)
+    #    b = None
+    #    with open(infile, 'rb') as f:
+    #        b = f.read()
+    server = read_server_from_path(infile)
+    clients = read_clients_from_path(infile)
+    clients.insert(0, server)
+    with open(outfile, 'w') as f:
+        #yaml.safe_dump(server, f, sort_keys=False)
+        yaml.safe_dump(clients, f, sort_keys=False)
+
+if __name__ == '__main__':
+    to_yaml('/home/defazio1/last_rcvds/last_rcvd_saved_olaf', '/home/defazio1/last_rcvds/doodoo_olaf.yaml')
